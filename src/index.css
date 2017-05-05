@@ -3,3 +3,10 @@ body {
   padding: 0;
   font-family: sans-serif;
 }
+
+.movie-results li {
+  list-style: none;
+  float: left;
+  width: 300px;
+  height: 460px;
+}

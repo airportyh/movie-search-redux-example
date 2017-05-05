@@ -44,13 +44,14 @@ class MovieWidget extends React.Component {
     if (this.props.error) {
       resultDisplay = <p>{this.props.error}</p>;
     } else {
-      resultDisplay = <div>
+      resultDisplay = <div className="movie-results">
         <h3>Search Results</h3>
         <ul>
           {
             this.props.movieResults.map((movie, idx) =>
               <li key={idx}>
-                {movie.title}
+                <img src={`https://image.tmdb.org/t/p/w300${movie.poster_path}`}
+                  alt={movie.title}/>
               </li>
             )
           }

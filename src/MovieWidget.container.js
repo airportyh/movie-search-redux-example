@@ -8,10 +8,7 @@ const MovieWidgetContainer = ReactRedux.connect(
     movieResults: state.movieResults,
     error: state.error
   }),
-  {
-    changeQuery: actions.changeQuery,
-    searchMovies: actions.searchMovies
-  }
+  actions
 )(MovieWidget);
 
 export default MovieWidgetContainer;

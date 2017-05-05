@@ -2,10 +2,17 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import * as ReactRedux from 'react-redux';
 import * as Redux from 'redux';
+import ReduxThunk from 'redux-thunk';
 import './index.css';
 
 function changeQuery(value) {
   return { type: 'change-query', value: value };
+}
+
+function searchMovies(query) {
+  return function(dispatch) {
+    dispatch({ type: 'test-action' });
+  };
 }
 
 class MovieWidget extends React.Component {
@@ -15,7 +22,7 @@ class MovieWidget extends React.Component {
         <input type="text"
           value={this.props.query}
           onChange={event => this.props.changeQuery(event.target.value)}/>
-        <button>Search Movies</button>
+        <button onClick={() => this.props.searchMovies(this.props.query)}>Search Movies</button>
       </div>
     )
   }
@@ -24,7 +31,8 @@ class MovieWidget extends React.Component {
 const MovieWidgetContainer = ReactRedux.connect(
   state => ({ query: state.query }),
   {
-    changeQuery: changeQuery
+    changeQuery: changeQuery,
+    searchMovies: searchMovies
   }
 )(MovieWidget);
 
@@ -42,7 +50,9 @@ function reducer(state = INITIAL_STATE, action) {
 
 const store = Redux.createStore(
   reducer,
-  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
+  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__(),
+  Redux.applyMiddleware(ReduxThunk)
+);
 
 ReactDOM.render(
   <ReactRedux.Provider store={store}>

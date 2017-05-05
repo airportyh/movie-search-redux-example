@@ -17,17 +17,21 @@ function searchMovies(query) {
       url: 'https://api.themoviedb.org/3/search/movie',
       data: {
         api_key: 'fca7302d15175b6bbe117ec2d07df7e6',
-        query: 'James Bond'
+        query: query
       }
     })
-    .then(data => dispatch({
-      type: 'movie-search-results',
-      results: data.results
-    }))
+    .then(data => {
+      console.log('new results', data);
+      dispatch({
+        type: 'movie-search-results',
+        results: data.results
+      })
+    })
     .catch(err => {
+      let error = (err && err.responseJSON && err.responseJSON.status_message) || 'Something went wrong';
       dispatch({
         type: 'error',
-        error: err
+        error: error
       });
     });
   };
@@ -36,22 +40,30 @@ function searchMovies(query) {
 class MovieWidget extends React.Component {
   render() {
     console.log('movies results?', this.props.movieResults);
+    let resultDisplay;
+    if (this.props.error) {
+      resultDisplay = <p>{this.props.error}</p>;
+    } else {
+      resultDisplay = <div>
+        <h3>Search Results</h3>
+        <ul>
+          {
+            this.props.movieResults.map((movie, idx) =>
+              <li key={idx}>
+                {movie.title}
+              </li>
+            )
+          }
+        </ul>
+      </div>;
+    }
     return (
       <div>
         <input type="text"
           value={this.props.query}
           onChange={event => this.props.changeQuery(event.target.value)}/>
         <button onClick={() => this.props.searchMovies(this.props.query)}>Search Movies</button>
-        <h3>Search Results</h3>
-        <ul>
-          {
-            this.props.movieResults.map((movie, idx) =>
-              <li key={idx}>
-                {movie}
-              </li>
-            )
-          }
-        </ul>
+        {resultDisplay}
       </div>
     )
   }
@@ -60,7 +72,8 @@ class MovieWidget extends React.Component {
 const MovieWidgetContainer = ReactRedux.connect(
   state => ({
     query: state.query,
-    movieResults: state.movieResults
+    movieResults: state.movieResults,
+    error: state.error
   }),
   {
     changeQuery: changeQuery,
@@ -70,7 +83,8 @@ const MovieWidgetContainer = ReactRedux.connect(
 
 const INITIAL_STATE = {
   query: '',
-  movieResults: []
+  movieResults: [],
+  error: null
 };
 function reducer(state = INITIAL_STATE, action) {
   if (action.type === 'change-query') {
@@ -80,6 +94,10 @@ function reducer(state = INITIAL_STATE, action) {
   } else if (action.type === 'movie-search-results') {
     return Object.assign({}, state, {
       movieResults: action.results
+    });
+  } else if (action.type === 'error') {
+    return Object.assign({}, state, {
+      error: action.error
     });
   }
   return state;
